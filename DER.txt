@@ -1,0 +1,58 @@
+CREATE TABLE Paciente (
+    id_paciente SERIAL PRIMARY KEY,
+    nome VARCHAR NOT NULL,
+    data_nascimento DATE NOT NULL,
+    cpf VARCHAR UNIQUE NOT NULL,
+    endereco VARCHAR,
+    telefone VARCHAR,
+    email VARCHAR UNIQUE NOT NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Medico (
+    id_medico SERIAL PRIMARY KEY,
+    nome VARCHAR NOT NULL,
+    crm VARCHAR UNIQUE NOT NULL,
+    especialidade VARCHAR NOT NULL,
+    telefone VARCHAR,
+    email VARCHAR UNIQUE NOT NULL,
+    data_contratacao DATE NOT NULL,
+    id_usuario INT UNIQUE,  -- Relacionamento 1:1 com Usuário
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE SET NULL
+);
+
+CREATE TABLE Usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nome VARCHAR NOT NULL,
+    email VARCHAR UNIQUE NOT NULL,
+    senha VARCHAR NOT NULL,  -- Hash de senha
+    tipo_usuario VARCHAR NOT NULL CHECK (tipo_usuario IN ('Admin', 'Médico', 'Recepcionista')),
+    ativo BOOLEAN DEFAULT TRUE,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Consulta (
+    id_consulta SERIAL PRIMARY KEY,
+    id_paciente INT NOT NULL,
+    id_medico INT NOT NULL,
+    data_consulta TIMESTAMP NOT NULL,
+    descricao TEXT,
+    status VARCHAR DEFAULT 'Agendada' CHECK (status IN ('Agendada', 'Realizada', 'Cancelada')),
+    id_prontuario INT UNIQUE,
+    FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente) ON DELETE CASCADE,
+    FOREIGN KEY (id_medico) REFERENCES Medico(id_medico) ON DELETE CASCADE,
+    FOREIGN KEY (id_prontuario) REFERENCES Prontuario(id_prontuario) ON DELETE SET NULL
+);
+
+CREATE TABLE Prontuario (
+    id_prontuario SERIAL PRIMARY KEY,
+    id_paciente INT NOT NULL,
+    id_medico INT NOT NULL,
+    id_consulta INT UNIQUE NOT NULL,
+    data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    diagnostico TEXT,
+    prescricao TEXT,
+    FOREIGN KEY (id_paciente) REFERENCES Paciente(id_paciente) ON DELETE CASCADE,
+    FOREIGN KEY (id_medico) REFERENCES Medico(id_medico) ON DELETE SET NULL,
+    FOREIGN KEY (id_consulta) REFERENCES Consulta(id_consulta) ON DELETE CASCADE
+);
