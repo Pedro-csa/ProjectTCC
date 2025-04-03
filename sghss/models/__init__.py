@@ -1,9 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
+from .paciente import Paciente
+from . import db  # Importe outros modelos aqui
 
-db = SQLAlchemy()
-
-# Importe todos os modelos aqui para que fiquem disponíveis
-from .paciente import Paciente  # Adicione esta linha
-from .usuario import Usuario    # E outros modelos que você tiver
-
-__all__ = ['db', 'Paciente', 'Usuario']  # Torne os modelos explicitamente disponíveis
+__all__ = ['db', 'Paciente']  # Torne os modelos acessíveis
